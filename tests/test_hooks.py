@@ -1,5 +1,5 @@
 """
-Tests for the activation hooks module (uth.analysis.hooks).
+Tests for the activation hooks module (src.analysis.hooks).
 
 Uses a simple mock model to validate hook registration, activation
 capture, mean-pooling, and cleanup behavior without requiring
@@ -10,13 +10,12 @@ import pytest
 import torch
 import torch.nn as nn
 
-from uth.analysis.hooks import (
+from src.analysis.cross_lingual_embedding_alignment.hooks import (
     ActivationStore,
-    register_model_hooks,
     _find_transformer_layers,
     get_model_layer_count,
+    register_model_hooks,
 )
-
 
 # ===================================================================
 # Mock model for testing
@@ -26,6 +25,7 @@ class MockTransformerLayer(nn.Module):
     """Simple mock transformer layer that outputs (hidden_states,)."""
 
     def __init__(self, hidden_dim: int = 32) -> None:
+        """Initialize with a single linear layer of *hidden_dim* units."""
         super().__init__()
         self.linear = nn.Linear(hidden_dim, hidden_dim)
 
@@ -38,6 +38,7 @@ class MockModel(nn.Module):
     """Mock HuggingFace-style model with model.model.layers structure."""
 
     def __init__(self, n_layers: int = 4, hidden_dim: int = 32) -> None:
+        """Create a mock model with *n_layers* transformer layers."""
         super().__init__()
         # Mimic the CohereForCausalLM structure:
         # model.model.layers[i]

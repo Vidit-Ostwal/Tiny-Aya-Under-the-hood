@@ -1,1 +1,1 @@
-"""Test suite for the uth package."""
+"""Test suite for the ``src`` package (Tiny Aya Under The Hood)."""

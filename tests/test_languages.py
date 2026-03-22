@@ -1,5 +1,5 @@
 """
-Tests for the language registry (uth.utils.languages).
+Tests for the language registry (src.utils.languages).
 
 Validates that all Language enum members have complete and consistent
 metadata, that convenience groupings are correctly built, and that
@@ -8,12 +8,12 @@ lookup functions work as expected.
 
 import pytest
 
-from uth.utils.languages import (
+from src.utils.languages import (
+    LANGUAGE_FAMILIES,
+    RESOURCE_GROUPS,
+    SCRIPT_GROUPS,
     Language,
     LanguageInfo,
-    LANGUAGE_FAMILIES,
-    SCRIPT_GROUPS,
-    RESOURCE_GROUPS,
     get_all_flores_codes,
     get_language_by_iso,
     get_language_by_name,

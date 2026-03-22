@@ -1,18 +1,18 @@
 """
-Tests for retrieval metrics (uth.analysis.retrieval_metrics).
+Tests for retrieval metrics (src.analysis.retrieval_metrics).
 
 Validates correctness of MRR, Recall@k, and similarity computation
 using known inputs with deterministic expected outputs.
 """
 
-import pytest
 import numpy as np
+import pytest
 
-from uth.analysis.retrieval_metrics import (
-    compute_mrr,
-    compute_recall_at_k,
+from src.analysis.cross_lingual_embedding_alignment.retrieval_metrics import (
     compute_all_retrieval_metrics,
     compute_cosine_similarity_matrix,
+    compute_mrr,
+    compute_recall_at_k,
 )
 
 

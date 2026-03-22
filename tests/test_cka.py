@@ -1,26 +1,23 @@
 """
-Tests for the CKA module (uth.analysis.cka).
+Tests for the CKA module (src.analysis.cka).
 
 Validates mathematical correctness, edge cases, input validation,
 and numerical stability of all CKA variants.
 """
 
 import pytest
-import numpy as np
 import torch
 
-from uth.analysis.cka import (
+from src.analysis.cross_lingual_embedding_alignment.cka import (
+    MinibatchCKAAccumulator,
+    _center_gram,
+    cka_permutation_test,
+    compute_layerwise_cka,
     linear_cka,
+    minibatch_cka,
     rbf_cka,
     whitened_cka,
-    minibatch_cka,
-    cka_permutation_test,
-    MinibatchCKAAccumulator,
-    compute_layerwise_cka,
-    _validate_activation_pair,
-    _center_gram,
 )
-
 
 # ===================================================================
 # Fixtures

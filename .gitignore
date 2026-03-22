@@ -37,6 +37,9 @@ build/
 .coverage
 htmlcov/
 
+# Linting
+.ruff_cache/
+
 # Environment variables
 .env
 .env.local
