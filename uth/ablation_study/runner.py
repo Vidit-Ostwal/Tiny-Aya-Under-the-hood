@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
+import sacrebleu
 
 from dataset_utils import (
     load_flores_dataset,
@@ -77,6 +78,64 @@ def compute_translation_loss(model, tokenizer, source_text, target_text):
     if num_tokens > 0:
         return (masked_loss / num_tokens).item()
     return float('inf')
+
+
+def generate_translation(model, tokenizer, source_text, max_new_tokens=50):
+    """
+    Generate translation using the model.
+
+    Args:
+        model: Language model
+        tokenizer: Tokenizer
+        source_text: Source sentence to translate
+        max_new_tokens: Maximum number of tokens to generate
+
+    Returns:
+        Generated translation string
+    """
+    # Format prompt
+    prompt = f"Translate the sentence to English: {source_text}"
+    messages = [{"role": "user", "content": prompt}]
+    formatted_prompt = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
+    )
+
+    # Tokenize
+    inputs = tokenizer(formatted_prompt, return_tensors='pt')
+    device = next(model.parameters()).device
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+
+    # Generate
+    model.eval()
+    with torch.inference_mode(mode=False):  # Don't use no_grad (breaks hooks)
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,  # Greedy decoding for consistency
+            pad_token_id=tokenizer.eos_token_id
+        )
+
+    # Decode (skip the prompt)
+    generated_text = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+    return generated_text.strip()
+
+
+def compute_bleu_score(hypothesis, reference):
+    """
+    Compute BLEU score between hypothesis and reference.
+
+    Args:
+        hypothesis: Generated translation
+        reference: Reference translation
+
+    Returns:
+        BLEU score (0-100)
+    """
+    # sacrebleu expects lists
+    bleu = sacrebleu.sentence_bleu(hypothesis, [reference])
+    return bleu.score
 
 
 def run_experiment(
@@ -164,9 +223,15 @@ def run_experiment(
                     baseline_loss = compute_translation_loss(
                         model, tokenizer, source_text, english_target
                     )
+                    baseline_translation = generate_translation(
+                        model, tokenizer, source_text
+                    )
+                    baseline_bleu = compute_bleu_score(baseline_translation, english_target)
                 except Exception as e:
                     print(f"\nError in baseline for {lang}: {e}")
                     baseline_loss = float('inf')
+                    baseline_translation = ""
+                    baseline_bleu = 0.0
                 finally:
                     remove_hooks(hooks)
 
@@ -185,6 +250,10 @@ def run_experiment(
                             intervened_loss = compute_translation_loss(
                                 model, tokenizer, source_text, english_target
                             )
+                            intervened_translation = generate_translation(
+                                model, tokenizer, source_text
+                            )
+                            intervened_bleu = compute_bleu_score(intervened_translation, english_target)
 
                             result = {
                                 'sentence_id': sent_id,
@@ -193,7 +262,13 @@ def run_experiment(
                                 'noise_level': noise_level,
                                 'baseline_loss': baseline_loss,
                                 'intervened_loss': intervened_loss,
-                                'loss_delta': intervened_loss - baseline_loss
+                                'loss_delta': intervened_loss - baseline_loss,
+                                'baseline_bleu': baseline_bleu,
+                                'intervened_bleu': intervened_bleu,
+                                'bleu_delta': baseline_bleu - intervened_bleu,
+                                'baseline_translation': baseline_translation,
+                                'intervened_translation': intervened_translation,
+                                'reference': english_target
                             }
 
                             f.write(json.dumps(result) + '\n')

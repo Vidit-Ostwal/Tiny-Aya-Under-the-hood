@@ -89,9 +89,20 @@ Results saved to `results/results.jsonl`:
   "noise_level": 0.5,
   "baseline_loss": 1.234,
   "intervened_loss": 2.567,
-  "loss_delta": 1.333
+  "loss_delta": 1.333,
+  "baseline_bleu": 45.2,
+  "intervened_bleu": 32.1,
+  "bleu_delta": 13.1,
+  "baseline_translation": "Hello, how are you?",
+  "intervened_translation": "Hello how are?",
+  "reference": "Hello, how are you?"
 }
 ```
+
+**Metrics tracked:**
+- **Loss**: Teacher-forced cross-entropy loss (lower is better)
+- **BLEU**: Translation quality score 0-100 (higher is better)
+- **Delta**: Change from baseline (loss_delta > 0 = worse, bleu_delta > 0 = worse)
 
 ## Analysis
 
@@ -104,5 +115,5 @@ The notebook includes visualizations:
 ## Requirements
 
 ```bash
-pip install torch transformers accelerate pandas matplotlib seaborn tqdm jupyter
+pip install torch transformers accelerate pandas matplotlib seaborn tqdm jupyter sacrebleu
 ```
