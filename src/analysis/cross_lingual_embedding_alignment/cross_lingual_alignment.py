@@ -39,7 +39,7 @@ Typical usage in a notebook::
     retrieval_scores = analyzer.compute_retrieval_scores()
 
     # Save everything
-    analyzer.save_results("results/cross_lingual/")
+    analyzer.save_results("analysis/results/cross_lingual/")
 
 References:
     - TIN-7 specification (Linear issue)

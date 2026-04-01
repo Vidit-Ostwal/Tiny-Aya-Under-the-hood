@@ -181,17 +181,24 @@ COHERE_API_KEY=...            # For linguistic_variation generation
 │           ├── clustering.py       # Hierarchical clustering, family/script dissolution, ARI
 │           └── visualization.py    # 12 publication-quality plotting functions
 │
-├── analysis/                       # Analysis notebooks and writeups (one subdir per topic)
-│   └── cross_lingual_embedding_alignment/  # Cross-lingual embedding alignment
-│       ├── paperback.md            # Full writeup with math formulations and references
-│       ├── 01_data_preparation.ipynb
-│       ├── 02_activation_extraction.ipynb
-│       ├── 03_cross_lingual_cka.ipynb
-│       ├── 04_language_family_clustering.ipynb
-│       ├── 05_anisotropy_whitened_cka.ipynb
-│       ├── 06_retrieval_alignment.ipynb
-│       ├── 07_script_decomposition.ipynb
-│       └── 08_regional_comparison.ipynb
+├── analysis/                       # Analysis notebooks, writeups, and results (one subdir per topic)
+│   ├── cross_lingual_embedding_alignment/  # Cross-lingual embedding alignment
+│   │   ├── paperback.md            # Full writeup with math formulations and references
+│   │   ├── 01_data_preparation.ipynb
+│   │   ├── 02_activation_extraction.ipynb
+│   │   ├── 03_cross_lingual_cka.ipynb
+│   │   ├── 04_language_family_clustering.ipynb
+│   │   ├── 05_anisotropy_whitened_cka.ipynb
+│   │   ├── 06_retrieval_alignment.ipynb
+│   │   ├── 07_script_decomposition.ipynb
+│   │   ├── 08_regional_comparison.ipynb
+│   │   └── 09_cross_model_drift.ipynb
+│   └── results/                    # Generated artifacts (from notebook execution, gitignored)
+│       └── cross_lingual/
+│           ├── activations/        # Mean-pooled sentence embeddings (.pt)
+│           ├── cka_matrices/       # Pairwise CKA similarity matrices (.npy)
+│           ├── metrics/            # Convergence curves, clustering metrics (.json)
+│           └── figures/            # All generated plots (.png)
 │
 ├── data/                           # Raw data files (CSVs -- not Python code)
 │   ├── test_data.csv               # 10 sample English sentences for translation pipeline
@@ -203,10 +210,6 @@ COHERE_API_KEY=...            # For linguistic_variation generation
 │   ├── test_hooks.py               # 16 tests: ActivationStore, hook lifecycle, mock models
 │   ├── test_languages.py           # 17 tests: Language enum, metadata, groupings, lookups
 │   └── test_retrieval.py           # 11 tests: MRR, Recall@k, cosine similarity, validation
-│
-├── results/                        # Generated artifacts (from notebook execution)
-│   └── cross_lingual/
-│       └── figures/                # corpus_statistics.png, language_distributions.png
 │
 └── agent_docs/                     # Internal research specification
     └── project_description.md      # Original 5-stage methodology
@@ -381,7 +384,7 @@ retrieval = analyzer.compute_retrieval_scores(source_lang="english")
 clustering = analyzer.compute_clustering_analysis()
 
 # Step 6: Save everything with standardized keys
-analyzer.save_results("results/cross_lingual/")
+analyzer.save_results("analysis/results/cross_lingual/")
 ```
 
 The analyzer caches activations and CKA matrices as instance attributes. Results are saved with `layer_{idx}_{metric}` naming convention for reproducibility. Activations can be loaded from disk via `load_activations()` to skip the expensive GPU step.
@@ -500,7 +503,7 @@ Style: seaborn `whitegrid` theme, `RdBu_r` colormap for CKA, 150 DPI screen / 30
 
 ### Output Artifacts
 
-All results are saved to `results/cross_lingual/`:
+All results are saved to `analysis/results/cross_lingual/`:
 
 | Directory | Contents | Naming |
 |---|---|---|

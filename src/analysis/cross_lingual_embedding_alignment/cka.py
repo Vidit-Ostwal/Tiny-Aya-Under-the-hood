@@ -442,7 +442,7 @@ def _whiten_representations(
 
     # Compute the whitening matrix: V @ diag(1/sqrt(lambda + reg)) @ V.T
     # The regularization prevents division by near-zero eigenvalues.
-    inv_sqrt_eigenvalues = 1.0 / torch.sqrt(eigenvalues + regularization)
+    inv_sqrt_eigenvalues = 1.0 / torch.sqrt(torch.clamp(eigenvalues, min=0.0) + regularization)
     whitening_matrix = (
         eigenvectors
         @ torch.diag(inv_sqrt_eigenvalues)
